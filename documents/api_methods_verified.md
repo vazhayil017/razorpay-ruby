@@ -485,7 +485,7 @@ ondemand_list = Razorpay::Settlement.fetch_all_ondemand_settlement(count: 10)
 ```ruby
 ondemand = Razorpay::Settlement.fetch_ondemand_settlement_by_id(
   "setl_DGlQ1Rj8os78Ec",
-  { "expand[]": "ondemand_payouts" }
+  { "expand[]" => "ondemand_payouts" }
 )
 ```
 
@@ -602,7 +602,7 @@ stakeholder = Razorpay::Stakeholder.fetch(
 stakeholders = Razorpay::Stakeholder.all("acc_linkedAccount123")
 ```
 
-> Note: In the gem, `all` does not accept query params; it always calls `GET /v2/accounts/{account_id}/stakeholders` with an empty query object.
+> Note: Unlike other `all` methods, this method only accepts `account_id` and does not support additional query parameters. It always calls `GET /v2/accounts/{account_id}/stakeholders` with an empty query object.
 
 ### 4. Edit Stakeholder
 
@@ -684,6 +684,8 @@ Razorpay::Product.fetch_tnc("payment_gateway")
 **Method:** `Razorpay::Product.edit(account_id, product_id, options = {})`
 
 **Example:**
+
+> Note: This method accepts options as a JSON string (use `.to_json`) when passing complex nested data via PATCH requests.
 
 ```ruby
 config = Razorpay::Product.edit(
