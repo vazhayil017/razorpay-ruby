@@ -87,6 +87,7 @@ If you are using rails, the right place to do this might be `config/initializers
 - [OAuthToken](documents/oauth_token.md)
 - [Dispute](documents/dispute.md)
 - [Document](documents/documents.md)
+- [API Methods (Verified)](documents/api_methods_verified.md)
 
 ## Development
 
