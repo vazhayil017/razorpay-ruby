@@ -805,195 +805,271 @@ All methods below have been verified against source code in `lib/razorpay/*.rb`.
 
 ### Addon API (`lib/razorpay/addon.rb`)
 
-- `Razorpay::Addon.fetch(id)` — Fetch an addon by ID
-- `Razorpay::Addon.all(options = {})` — List all addons
-- `Razorpay::Addon.create(subscription_id, options)` — Create addon for a subscription
-- `Razorpay::Addon.delete(id)` — Delete an addon
+Addons allow you to charge one-time fees to a subscription. Use for setup fees, extra charges, or any one-time additions.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::Addon.fetch(id)` | Retrieves details of a specific addon by its unique identifier. Returns addon metadata including amount, quantity, and associated subscription. |
+| `Razorpay::Addon.all(options = {})` | Lists all addons created in your account. Supports pagination via `count` and `skip` options. |
+| `Razorpay::Addon.create(subscription_id, options)` | Creates a new addon for an existing subscription. Pass the subscription ID and addon details (item_id, quantity). The addon amount is charged on the next billing cycle. |
+| `Razorpay::Addon.delete(id)` | Permanently deletes an addon. Once deleted, the addon cannot be recovered and will not be charged. |
 
 ---
 
 ### Card API (`lib/razorpay/card.rb`)
 
-- `Razorpay::Card.fetch(id)` — Fetch card details by ID
-- `Razorpay::Card.request_card_reference(options)` — Request card fingerprint/reference
+Card API allows you to retrieve saved card information and generate card fingerprints for tokenization.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::Card.fetch(id)` | Fetches details of a saved card by card ID. Returns card network, type (credit/debit), last 4 digits, and issuer information. |
+| `Razorpay::Card.request_card_reference(options)` | Generates a card fingerprint/reference for network tokenization. Used to create a unique reference for a card across merchants. |
 
 ---
 
 ### Customer API (`lib/razorpay/customer.rb`)
 
-- `Razorpay::Customer.create(options)` — Create a customer
-- `Razorpay::Customer.fetch(id)` — Fetch customer by ID
-- `Razorpay::Customer.edit(id, options = {})` — Update customer details
-- `Razorpay::Customer.all(options = {})` — List all customers
-- `customer.fetchTokens` — Fetch all tokens for a customer (instance method)
-- `customer.fetchToken(tokenId)` — Fetch specific token for customer (instance method)
-- `customer.deleteToken(tokenId)` — Delete a token (instance method)
-- `Razorpay::Customer.add_bank_account(id, options = {})` — Add bank account to customer
-- `Razorpay::Customer.delete_bank_account(id, bankAccountId)` — Delete bank account
-- `Razorpay::Customer.request_eligibility_check(options = {})` — Check customer eligibility
-- `Razorpay::Customer.fetch_eligibility(eligibilityId)` — Fetch eligibility details
+Customer API allows you to create customer profiles to save payment methods and enable recurring payments.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::Customer.create(options)` | Creates a new customer with contact details (name, email, phone). Required for saving cards and enabling subscriptions. |
+| `Razorpay::Customer.fetch(id)` | Retrieves customer details by customer ID. Returns saved contact information and GST details if present. |
+| `Razorpay::Customer.edit(id, options = {})` | Updates existing customer information. Use to modify contact details or add GST information. |
+| `Razorpay::Customer.all(options = {})` | Lists all customers. Supports pagination and filtering by email/phone. |
+| `customer.fetchTokens` | (Instance) Retrieves all saved payment tokens (cards, UPI VPAs) for the customer. Essential for recurring payments. |
+| `customer.fetchToken(tokenId)` | (Instance) Fetches details of a specific saved token by its ID. Returns token metadata and card/VPA details. |
+| `customer.deleteToken(tokenId)` | (Instance) Removes a saved payment token. The customer will need to re-authenticate to save the card again. |
+| `Razorpay::Customer.add_bank_account(id, options = {})` | Links a bank account to a customer for direct debit payments (NACH/eMandate). |
+| `Razorpay::Customer.delete_bank_account(id, bankAccountId)` | Removes a linked bank account from the customer profile. |
+| `Razorpay::Customer.request_eligibility_check(options = {})` | Checks customer eligibility for specific payment methods like EMI or Pay Later options. |
+| `Razorpay::Customer.fetch_eligibility(eligibilityId)` | Retrieves the result of a previously initiated eligibility check. |
 
 ---
 
 ### Fund Account API (`lib/razorpay/fund_account.rb`)
 
-- `Razorpay::FundAccount.create(options)` — Create a fund account
-- `Razorpay::FundAccount.all(data = {})` — List all fund accounts
+Fund Account API manages beneficiary accounts for payouts. Link bank accounts or VPAs to receive money.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::FundAccount.create(options)` | Creates a fund account by linking a bank account or VPA to a contact. Required before initiating payouts. |
+| `Razorpay::FundAccount.all(data = {})` | Lists all fund accounts. Filter by contact_id to get accounts for a specific beneficiary. |
 
 ---
 
 ### IIN API (`lib/razorpay/iin.rb`)
 
-- `Razorpay::Iin.fetch(id)` — Fetch card properties using token IIN
+IIN (Issuer Identification Number) API provides card BIN information for pre-validation and routing.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::Iin.fetch(id)` | Fetches card properties (network, type, issuer, EMI availability) using the first 6-8 digits (IIN/BIN) of a card. Useful for showing bank logos and EMI options before payment. |
 
 ---
 
 ### Invoice API (`lib/razorpay/invoice.rb`)
 
-- `Razorpay::Invoice.create(options)` — Create an invoice
-- `Razorpay::Invoice.fetch(id)` — Fetch invoice by ID
-- `Razorpay::Invoice.all(options = {})` — List all invoices
-- `Razorpay::Invoice.edit(id, options = {})` — Edit an invoice
-- `Razorpay::Invoice.issue(id)` — Issue an invoice
-- `Razorpay::Invoice.cancel(id)` — Cancel an invoice
-- `Razorpay::Invoice.notify_by(id, medium)` — Send invoice notification (email/sms)
-- `Razorpay::Invoice.delete(id)` — Delete an invoice
-- `invoice.edit(options = {})` — Instance method to edit
-- `invoice.issue` — Instance method to issue
-- `invoice.cancel` — Instance method to cancel
+Invoice API allows you to create, manage, and send professional invoices with automatic payment link generation.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::Invoice.create(options)` | Creates a draft or issued invoice with line items, taxes, and customer details. Automatically generates a payment link. |
+| `Razorpay::Invoice.fetch(id)` | Retrieves complete invoice details including status, payment link, and line items. |
+| `Razorpay::Invoice.all(options = {})` | Lists all invoices. Filter by status (draft, issued, paid, cancelled) or date range. |
+| `Razorpay::Invoice.edit(id, options = {})` | Modifies a draft invoice. Cannot edit issued invoices—cancel and recreate instead. |
+| `Razorpay::Invoice.issue(id)` | Issues a draft invoice, making it payable. Generates and activates the payment link. |
+| `Razorpay::Invoice.cancel(id)` | Cancels an invoice. Use for voiding unpaid invoices. Paid invoices cannot be cancelled. |
+| `Razorpay::Invoice.notify_by(id, medium)` | Sends invoice notification via 'email' or 'sms' to the customer. Includes payment link. |
+| `Razorpay::Invoice.delete(id)` | Permanently deletes a draft invoice. Issued invoices must be cancelled, not deleted. |
+| `invoice.edit(options = {})` | (Instance) Convenience method to edit the current invoice. |
+| `invoice.issue` | (Instance) Issues the current draft invoice. |
+| `invoice.cancel` | (Instance) Cancels the current invoice. |
 
 ---
 
 ### Item API (`lib/razorpay/item.rb`)
 
-- `Razorpay::Item.create(options)` — Create an item
-- `Razorpay::Item.fetch(id)` — Fetch item by ID
-- `Razorpay::Item.edit(id, options = {})` — Edit an item (converts `:active` boolean to 1/0)
-- `Razorpay::Item.all(options = {})` — List all items
-- `Razorpay::Item.delete(id)` — Delete an item
+Item API manages reusable product/service items for invoices and subscriptions.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::Item.create(options)` | Creates a reusable item with name, amount, currency, and description. Use for consistent pricing across invoices. |
+| `Razorpay::Item.fetch(id)` | Retrieves item details by ID. Returns pricing and metadata. |
+| `Razorpay::Item.edit(id, options = {})` | Updates item properties. Set `active: false` to soft-delete. The gem auto-converts boolean to 1/0. |
+| `Razorpay::Item.all(options = {})` | Lists all items. Filter by `active` status to exclude deleted items. |
+| `Razorpay::Item.delete(id)` | Permanently deletes an item. Items linked to active subscriptions cannot be deleted. |
 
 ---
 
 ### OAuth Token API (`lib/razorpay/oauth_token.rb`)
 
-- `Razorpay::OAuthToken.get_auth_url(options)` — Generate OAuth authorization URL
-- `Razorpay::OAuthToken.get_access_token(options)` — Get access token
-- `Razorpay::OAuthToken.refresh_token(options)` — Refresh an access token
-- `Razorpay::OAuthToken.revoke_token(options)` — Revoke a token
+OAuth API enables platform/marketplace authentication for accessing connected accounts.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::OAuthToken.get_auth_url(options)` | Generates the authorization URL for OAuth flow. Redirect merchants here to initiate account linking. Requires client_id, redirect_uri, scopes, and state. |
+| `Razorpay::OAuthToken.get_access_token(options)` | Exchanges authorization code for access/refresh tokens. Call after merchant authorizes your app. |
+| `Razorpay::OAuthToken.refresh_token(options)` | Gets a new access token using a refresh token. Use when access token expires (tokens valid ~30 days). |
+| `Razorpay::OAuthToken.revoke_token(options)` | Invalidates an access or refresh token. Use when merchant disconnects or for security. |
 
 ---
 
 ### Payment Link API (`lib/razorpay/payment_link.rb`)
 
-- `Razorpay::PaymentLink.create(options)` — Create a payment link
-- `Razorpay::PaymentLink.fetch(id)` — Fetch payment link by ID
-- `Razorpay::PaymentLink.edit(id, options = {})` — Edit a payment link
-- `Razorpay::PaymentLink.all(options = {})` — List all payment links
-- `Razorpay::PaymentLink.cancel(id)` — Cancel a payment link
-- `Razorpay::PaymentLink.notify_by(id, medium)` — Send payment link notification
+Payment Links are shareable URLs for collecting payments via SMS, email, or messaging apps.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::PaymentLink.create(options)` | Creates a payment link with amount, description, and optional customer details. Returns a shareable URL. Supports partial payments and expiry. |
+| `Razorpay::PaymentLink.fetch(id)` | Retrieves payment link details including status (created, paid, expired, cancelled) and payments received. |
+| `Razorpay::PaymentLink.edit(id, options = {})` | Updates payment link properties like expiry time, notes, or reminder settings. Amount cannot be changed. |
+| `Razorpay::PaymentLink.all(options = {})` | Lists all payment links. Filter by status, reference_id, or date range. |
+| `Razorpay::PaymentLink.cancel(id)` | Cancels an active payment link. Payments can no longer be made on this link. |
+| `Razorpay::PaymentLink.notify_by(id, medium)` | Sends/resends payment link via 'email' or 'sms'. Useful for payment reminders. |
 
 ---
 
 ### Payment Methods API (`lib/razorpay/payment_method.rb`)
 
-- `Razorpay::PaymentMethods.all(options = {})` — Fetch all available payment methods
+Retrieve available payment methods configured for your account.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::PaymentMethods.all(options = {})` | Returns all enabled payment methods (cards, UPI, netbanking, wallets, EMI) for your merchant account. Useful for building custom checkout UIs. |
 
 ---
 
 ### Plan API (`lib/razorpay/plan.rb`)
 
-- `Razorpay::Plan.create(options)` — Create a subscription plan
-- `Razorpay::Plan.fetch(id)` — Fetch plan by ID
-- `Razorpay::Plan.all(options = {})` — List all plans
+Plan API manages subscription billing plans with recurring pricing.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::Plan.create(options)` | Creates a subscription plan with billing period (daily/weekly/monthly/yearly), interval, and amount. Plans are templates for subscriptions. |
+| `Razorpay::Plan.fetch(id)` | Retrieves plan details including pricing, period, and usage count. |
+| `Razorpay::Plan.all(options = {})` | Lists all plans. Plans cannot be deleted—create new ones as needed. |
 
 ---
 
 ### QR Code API (`lib/razorpay/qr_code.rb`)
 
-- `Razorpay::QrCode.create(options)` — Create a QR code (converts `:fixed_amount` boolean to 1/0)
-- `Razorpay::QrCode.fetch(id)` — Fetch QR code by ID
-- `Razorpay::QrCode.all(options = {})` — List all QR codes
-- `qrcode.fetch_payments(options = {})` — Fetch payments for a QR code (instance method)
-- `qrcode.close` — Close a QR code (instance method)
+QR Code API creates UPI QR codes for in-store or digital payments.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::QrCode.create(options)` | Generates a QR code for UPI payments. Can be fixed amount (one-time) or dynamic (reusable). Set `fixed_amount: true` for single-use. |
+| `Razorpay::QrCode.fetch(id)` | Retrieves QR code details including image URL, status (active/closed), and payments received. |
+| `Razorpay::QrCode.all(options = {})` | Lists all QR codes. Filter by status or customer_id. |
+| `qrcode.fetch_payments(options = {})` | (Instance) Lists all payments made on this QR code. Useful for reconciliation. |
+| `qrcode.close` | (Instance) Closes the QR code. No further payments can be made. Use for expired offers or completed transactions. |
 
 ---
 
 ### Subscription API (`lib/razorpay/subscription.rb`)
 
-- `Razorpay::Subscription.create(options)` — Create a subscription
-- `Razorpay::Subscription.fetch(id)` — Fetch subscription by ID
-- `Razorpay::Subscription.all(options = {})` — List all subscriptions
-- `Razorpay::Subscription.cancel(id, options = {})` — Cancel a subscription
-- `subscription.cancel(options = {})` — Instance method to cancel
-- `subscription.edit(options = {})` — Edit subscription (instance method)
-- `subscription.pending_update` — Retrieve scheduled changes (instance method)
-- `Razorpay::Subscription.cancel_scheduled_changes(id)` — Cancel scheduled changes
-- `Razorpay::Subscription.pause(id, options = {})` — Pause a subscription
-- `Razorpay::Subscription.resume(id, options = {})` — Resume a subscription
-- `Razorpay::Subscription.delete_offer(id, offerId)` — Delete an offer from subscription
+Subscription API manages recurring billing with automatic charge collection.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::Subscription.create(options)` | Creates a subscription linking a customer to a plan. Handles authentication and automatic recurring charges. |
+| `Razorpay::Subscription.fetch(id)` | Retrieves subscription details including current status, billing cycle, and pending amount. |
+| `Razorpay::Subscription.all(options = {})` | Lists all subscriptions. Filter by plan_id, status, or customer. |
+| `Razorpay::Subscription.cancel(id, options = {})` | Cancels a subscription. Set `cancel_at_cycle_end: true` to cancel at period end instead of immediately. |
+| `subscription.cancel(options = {})` | (Instance) Cancels the current subscription. |
+| `subscription.edit(options = {})` | (Instance) Modifies subscription—update quantity, plan changes (scheduled for next cycle). |
+| `subscription.pending_update` | (Instance) Retrieves scheduled changes that will apply at next billing cycle. |
+| `Razorpay::Subscription.cancel_scheduled_changes(id)` | Removes pending updates. Subscription continues with current settings. |
+| `Razorpay::Subscription.pause(id, options = {})` | Temporarily pauses billing. Customer retains access based on your implementation. |
+| `Razorpay::Subscription.resume(id, options = {})` | Resumes a paused subscription. Next charge date is recalculated. |
+| `Razorpay::Subscription.delete_offer(id, offerId)` | Removes a linked offer/discount from the subscription. |
 
 ---
 
 ### Subscription Registration API (`lib/razorpay/subscription_registration.rb`)
 
-- `Razorpay::SubscriptionRegistration.create(options)` — Create authorization link for recurring payments
+Create authorization links for recurring payments setup (eMandate/UPI AutoPay).
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::SubscriptionRegistration.create(options)` | Creates an authentication link for recurring payment authorization. Customer authorizes via this link; you receive a token for future charges. Used for eNACH, eMandate, and UPI AutoPay setup. |
 
 ---
 
 ### Token API (`lib/razorpay/token.rb`)
 
-- `Razorpay::Token.create(options)` — Create a token
-- `Razorpay::Token.fetch(options)` — Fetch token details (POST-based)
-- `Razorpay::Token.delete(options)` — Delete a token (POST-based)
-- `Razorpay::Token.process_payment_on_alternate_pa_or_pg(options)` — Process payment on alternate PA/PG
+Token API manages saved payment instruments for recurring charges.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::Token.create(options)` | Creates a token by tokenizing card/bank details. Use for storing payment methods securely. |
+| `Razorpay::Token.fetch(options)` | Retrieves token details. Unique: uses POST instead of GET—pass token ID in request body. |
+| `Razorpay::Token.delete(options)` | Deletes a saved token. Future recurring charges will fail—customer must re-authorize. Uses POST method. |
+| `Razorpay::Token.process_payment_on_alternate_pa_or_pg(options)` | Processes tokenized payment through an alternate PA/PG. For service provider token integrations. |
 
 ---
 
 ### Virtual Account API (`lib/razorpay/virtual_account.rb`)
 
-- `Razorpay::VirtualAccount.create(options)` — Create a virtual account
-- `Razorpay::VirtualAccount.fetch(id)` — Fetch virtual account by ID
-- `Razorpay::VirtualAccount.all(options = {})` — List all virtual accounts
-- `Razorpay::VirtualAccount.close(id)` — Close a virtual account
-- `virtual_account.payments(options = {})` — Fetch payments for VA (instance method)
-- `Razorpay::VirtualAccount.add_receiver(id, options = {})` — Add receiver to VA
-- `Razorpay::VirtualAccount.allowed_payer(id, options = {})` — Add allowed payer
-- `Razorpay::VirtualAccount.delete_allowed_payer(id, payer_id)` — Delete allowed payer
+Virtual Accounts enable B2B payments via bank transfers with automatic reconciliation.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::VirtualAccount.create(options)` | Creates a virtual account with a unique account number. Customers pay via NEFT/RTGS/IMPS to this account. |
+| `Razorpay::VirtualAccount.fetch(id)` | Retrieves VA details including bank account number, IFSC, and payment status. |
+| `Razorpay::VirtualAccount.all(options = {})` | Lists all virtual accounts. Filter by status (active/closed) or customer. |
+| `Razorpay::VirtualAccount.close(id)` | Closes a virtual account. Use when invoice is paid or relationship ends. |
+| `virtual_account.payments(options = {})` | (Instance) Lists all payments received on this VA. Essential for reconciliation. |
+| `Razorpay::VirtualAccount.add_receiver(id, options = {})` | Adds additional receivers (bank accounts) to collect payments into the VA. |
+| `Razorpay::VirtualAccount.allowed_payer(id, options = {})` | Restricts VA to accept payments only from specific bank accounts. For controlled B2B payments. |
+| `Razorpay::VirtualAccount.delete_allowed_payer(id, payer_id)` | Removes a payer restriction, allowing payments from any account again. |
 
 ---
 
 ### Webhook API (`lib/razorpay/webhook.rb`)
 
-- `Razorpay::Webhook.create(options, account_id = nil)` — Create a webhook
-- `Razorpay::Webhook.all(options = {}, account_id = nil)` — List all webhooks
-- `Razorpay::Webhook.fetch(id, account_id)` — Fetch webhook by ID
-- `Razorpay::Webhook.edit(options, id, account_id = nil)` — Edit a webhook
-- `Razorpay::Webhook.delete(id, account_id)` — Delete a webhook
+Webhook API configures event notifications for real-time payment updates.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::Webhook.create(options, account_id = nil)` | Registers a webhook endpoint to receive event notifications. Pass `account_id` for linked account webhooks. Events include payment.captured, refund.created, etc. |
+| `Razorpay::Webhook.all(options = {}, account_id = nil)` | Lists all configured webhooks. Use `account_id` to list webhooks for a connected account. |
+| `Razorpay::Webhook.fetch(id, account_id)` | Retrieves webhook configuration including URL, events subscribed, and active status. |
+| `Razorpay::Webhook.edit(options, id, account_id = nil)` | Updates webhook URL or subscribed events. Use to add/remove event types. |
+| `Razorpay::Webhook.delete(id, account_id)` | Removes a webhook. You'll stop receiving notifications for configured events. |
 
 ---
 
 ### Payment API Extras (`lib/razorpay/payment.rb`)
 
-- `Razorpay::Payment.all(options = {})` — List all payments
-- `Razorpay::Payment.create_recurring_payment(data = {})` — Create recurring payment
-- `Razorpay::Payment.create_json_payment(data = {})` — Create payment via JSON
-- `Razorpay::Payment.fetch_payment_downtime` — Fetch payment downtime details
-- `Razorpay::Payment.fetch_payment_downtime_by_id(id)` — Fetch downtime by ID
-- `Razorpay::Payment.fetch_card_details(id)` — Fetch card details for payment
-- `Razorpay::Payment.fetch_multiple_refund(id, options = {})` — Fetch multiple refunds for payment
-- `Razorpay::Payment.otp_generate(id)` — Generate OTP for payment
-- `payment.otp_submit(options)` — Submit OTP (instance method)
-- `payment.otp_resend` — Resend OTP (instance method)
-- `Razorpay::Payment.create_upi(data = {})` — Create UPI payment
-- `Razorpay::Payment.validate_vpa(data = {})` — Validate VPA
-- `Razorpay::Payment.expand_details(id, options = {})` — Fetch payment with expanded details
-- `payment.edit(options = {})` — Edit payment (instance method)
-- `payment.bank_transfer` — Fetch bank transfer details (instance method)
-- `payment.refund!(options = {})` — Refund and update payment (instance method)
-- `payment.capture!(options)` — Capture and update payment (instance method)
+Additional payment methods beyond basic capture/refund operations.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::Payment.all(options = {})` | Lists all payments. Filter by status, method, date range. Supports pagination via `count` and `skip`. |
+| `Razorpay::Payment.create_recurring_payment(data = {})` | Creates a recurring payment using a saved token. Charges customer without interaction. |
+| `Razorpay::Payment.create_json_payment(data = {})` | Creates a payment via JSON payload. Use for S2S (server-to-server) card payments. |
+| `Razorpay::Payment.fetch_payment_downtime` | Lists current payment method downtimes. Check before retrying failed payments. |
+| `Razorpay::Payment.fetch_payment_downtime_by_id(id)` | Gets details of a specific downtime event including affected methods and duration. |
+| `Razorpay::Payment.fetch_card_details(id)` | Retrieves card details (network, type, issuer) for a payment made via card. |
+| `Razorpay::Payment.fetch_multiple_refund(id, options = {})` | Lists all refunds for a specific payment. Use for partial refund tracking. |
+| `Razorpay::Payment.otp_generate(id)` | Generates OTP for completing a pending card payment that requires authentication. |
+| `payment.otp_submit(options)` | (Instance) Submits OTP to authenticate and complete the payment. |
+| `payment.otp_resend` | (Instance) Requests a new OTP if the previous one expired or wasn't received. |
+| `Razorpay::Payment.create_upi(data = {})` | Creates a UPI collect request or generates UPI intent link. |
+| `Razorpay::Payment.validate_vpa(data = {})` | Validates a UPI VPA (e.g., name@upi) before initiating payment. Returns account holder name. |
+| `Razorpay::Payment.expand_details(id, options = {})` | Fetches payment with expanded related entities (card, emi, offers). Pass `expand[]=card` etc. |
+| `payment.edit(options = {})` | (Instance) Updates payment notes. Only notes can be modified post-creation. |
+| `payment.bank_transfer` | (Instance) Retrieves bank transfer details for payments received via NEFT/RTGS/IMPS. |
+| `payment.refund!(options = {})` | (Instance) Initiates refund and updates the payment object in place with new status. |
+| `payment.capture!(options)` | (Instance) Captures authorized payment and updates the object with captured status. |
 
 ---
 
 ### Utility Extras (`lib/razorpay/utility.rb`)
 
-- `Razorpay::Utility.generate_onboarding_signature(body, secret)` — Generate signature for onboarding
+Helper methods for signature generation and verification.
+
+| Method | Description |
+|--------|-------------|
+| `Razorpay::Utility.generate_onboarding_signature(body, secret)` | Generates an encrypted signature for Route onboarding. Used when creating linked accounts programmatically via OAuth. Returns hex-encoded encrypted payload. |
